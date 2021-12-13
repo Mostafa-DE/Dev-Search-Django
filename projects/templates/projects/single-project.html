@@ -1,16 +1,6 @@
-{% extends "main.html" %} {% block content %}
+{% extends "main.html" %} 
 
-<h1>{{projects.title}}</h1>
-<p>{{projects.description}}</p>
-<br />
-
-<h3>Technologies:-</h3>
-<ul>
-  {% for tag in projects.tags.all %}
-  <li>{{tag}}</li>
-  {% endfor %}
-</ul>
-
+{% block content %}
 
 <!-- Main Section -->
   <main class="singleProject my-md">
