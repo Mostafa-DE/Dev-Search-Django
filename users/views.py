@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from .models import Profile, Skill
+from .models import Profile
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .forms import CustomUserCreationForm, ProfileForm, SkillForm
+from .forms import CustomUserCreationForm, ProfileForm, SkillForm, MessageForm
 from .utils import searchProfiles, paginationProfiles
 
 
@@ -20,6 +20,7 @@ def profiles(request):
         "custom_range": custom_range
     }
     return render(request ,'users/profiles.html', context)
+
 
 
 def userProfile(request, pk):
@@ -65,10 +66,13 @@ def loginUser(request):
     return render(request, 'users/login_register.html', context)
 
 
+
 def logoutUser(request):
     logout(request)
     messages.success(request,"User was successfully logged out")
     return redirect('login')
+
+
 
 def registerUser(request):
     page="register"
@@ -95,6 +99,7 @@ def registerUser(request):
         "form": form
     }
     return render(request, 'users/login_register.html', context)
+
 
 
 @login_required(login_url="login")
@@ -174,6 +179,7 @@ def updateSkill(request, pk):
 
 
 def deleteSkill(request, pk):
+    
     profile = request.user.profile
     skill = profile.skill_set.get(id=pk)
     if request.method == "POST":
@@ -184,3 +190,62 @@ def deleteSkill(request, pk):
         "object": skill
     }
     return render(request, 'delete_confirm_template.html', context)
+
+
+
+@login_required(login_url="login")
+def userInbox(request):
+    profile = request.user.profile # get user profile 
+    profileMessages =  profile.messages.all() # get all user messages 
+    unReadMessages = profileMessages.filter(is_read=False).count() # get all unread messages
+    context = {
+        "profileMessages": profileMessages,
+        "unReadMessages": unReadMessages
+    }
+    return render(request, 'users/user_inbox.html', context)
+
+
+@login_required(login_url="login")
+def viewUserMessage(request, pk):
+    profile = request.user.profile 
+    message = profile.messages.get(id=pk)
+    if message.is_read == False: # mark message as read
+        message.is_read = True
+        message.save()
+    context = {
+        "message": message
+    }
+    return render(request, 'users/user_message.html', context)
+
+
+
+def createMessage(request, pk):
+    receiver = Profile.objects.get(id=pk)
+    form = MessageForm()
+    
+    try:
+        sender = request.user.profile
+    except:
+        sender = None
+        
+    if request.method == "POST":
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit= False)
+            message.sender = sender
+            message.receiver = receiver
+            
+            if sender:
+                message.name = sender.name
+                message.email = sender.email
+                
+            message.save()
+            messages.success(request, "Your message was successfully sent!!")
+            return redirect('user-profile', pk=receiver.id)
+            
+    
+    context = {
+        "receiver": receiver,
+        "form": form
+    }
+    return render(request, 'users/message_form.html', context)

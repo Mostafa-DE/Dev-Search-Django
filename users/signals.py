@@ -3,6 +3,9 @@ from .models import Profile
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
 
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 @receiver(post_save, sender=User)
 def createProfile(sender, instance, created, **kwargs):
@@ -13,6 +16,17 @@ def createProfile(sender, instance, created, **kwargs):
             username=user.username,
             email=user.email,
             name=user.first_name
+        )
+        
+        subject = "Welcome to DevSearch"
+        message = "We are glad that you are here!!"
+        
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [profile.email],
+            fail_silently=False,
         )
     
     

@@ -18,20 +18,19 @@
         <li class="header__menuItem">
           <a href="{% url 'home' %}">Projects</a>
         </li>
-        <li class="header__menuItem"><a href="inbox.html">Inbox</a></li>
+
+        {% if request.user.is_authenticated %}
+        <li class="header__menuItem"><a href="{% url 'user-inbox' %}">Inbox</a></li>
         <li class="header__menuItem"><a href="{% url 'account' %}">My Account</a></li>
-
-
-          {% if request.user.is_authenticated %}
         <li class="header__menuItem">
           <a href="{% url 'create-project' %}" 
             >Add Project</a
           >
         </li>
           <a href="{% url 'logout' %}" class="btn btn--sub">Logout</a>
-          {% else %}
+        {% else %}
           <a href="{% url 'login' %}" class="btn btn--sub">Login/Sign Up</a>
-          {% endif %}
+        {% endif %}
         </li>
       </ul>
     </nav>
