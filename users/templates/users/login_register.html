@@ -24,11 +24,6 @@
           <div class="form__field">
             <label for="formInput#confirm-password">{{field.label}}</label>
               {{ field }}
-
-              <!-- {% if field.help_text %}
-                <small>{{field.help_text}}</small>
-              {% endif %} -->
-
               {% for error in field.errors %}
                 <p style="color:red" >{{error}}</p>
               {% endfor %}
@@ -61,7 +56,7 @@
       <p>Hello Developer, Welcome Back!</p>
     </div>
 
-    <form action="{% url 'login' %}" method="POST" class="form auth__form">
+    <form action="" method="POST" class="form auth__form">
       {% csrf_token %}
       <!-- Input:Username -->
       <div class="form__field">
