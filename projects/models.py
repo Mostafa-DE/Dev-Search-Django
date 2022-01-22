@@ -4,7 +4,7 @@ from users.models import Profile
 import uuid
 
 class Project(models.Model):
-    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL)
+    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
     title= models.CharField(max_length=255)
     description= models.TextField(null=True, blank=True, max_length=255)
     featured_image = models.ImageField(null=True, blank=True, default="default.jpg")
@@ -22,6 +22,15 @@ class Project(models.Model):
     class Meta:
         ordering = ['-vote_ratio', "-vote_total", "title"] # order of projects depends on review 
     
+
+    
+    @property
+    def imageURL(self):
+        try:
+            url = self.featured_image.url
+        except:
+            url = ''
+        return url
     
     @property
     def reviewers(self):
